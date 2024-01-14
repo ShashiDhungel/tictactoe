@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      margin: 20px;
+    }
+    td {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      border: 1px solid #000;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Tic Tac Toe</h1>
+
+<table id="ticTacToe">
+  <tr>
+    <td onclick="makeMove(0, 0)"></td>
+    <td onclick="makeMove(0, 1)"></td>
+    <td onclick="makeMove(0, 2)"></td>
+  </tr>
+  <tr>
+    <td onclick="makeMove(1, 0)"></td>
+    <td onclick="makeMove(1, 1)"></td>
+    <td onclick="makeMove(1, 2)"></td>
+  </tr>
+  <tr>
+    <td onclick="makeMove(2, 0)"></td>
+    <td onclick="makeMove(2, 1)"></td>
+    <td onclick="makeMove(2, 2)"></td>
+  </tr>
+</table>
+
+<script>
+  let currentPlayer = 'X';
+  let board = [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
+  ];
+
+  function makeMove(row, col) {
+    if (board[row][col] === '' && !checkWinner()) {
+      board[row][col] = currentPlayer;
+      document.getElementById('ticTacToe').rows[row].cells[col].innerHTML = currentPlayer;
+
+      if (checkWinner()) {
+        alert(currentPlayer + ' wins!');
+      } else if (boardFull()) {
+        alert('It\'s a tie!');
+      } else {
+        currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
+      }
+    }
+  }
+
+  function checkWinner() {
+    // Check rows
+    for (let i = 0; i < 3; i++) {
+      if (board[i][0] !== '' && board[i][0] === board[i][1] && board[i][1] === board[i][2]) {
+        return true;
+      }
+    }
+
+    // Check columns
+    for (let j = 0; j < 3; j++) {
+      if (board[0][j] !== '' && board[0][j] === board[1][j] && board[1][j] === board[2][j]) {
+        return true;
+      }
+    }
+
+    // Check diagonals
+    if (board[0][0] !== '' && board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
+      return true;
+    }
+    if (board[0][2] !== '' && board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function boardFull() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] === '') {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+</script>
+
+</body>
+</html>
