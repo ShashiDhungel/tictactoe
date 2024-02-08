@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pie Chart App</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-database.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,21 +37,35 @@
     <canvas id="myChart" width="400" height="400"></canvas>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         let data = {};
         const ctx = document.getElementById('myChart').getContext('2d');
-        let myChart; // Declare myChart variable outside of the function
+        let myChart;
 
         function updateChart() {
             const dropdown = document.getElementById('nameDropdown');
             const selectedName = dropdown.value;
 
-            if (data[selectedName]) {
-                data[selectedName]++;
-            } else {
-                data[selectedName] = 1;
-            }
+            // Increment the count in the database
+            const nameRef = database.ref(selectedName);
+            nameRef.transaction((currentValue) => (currentValue || 0) + 1);
 
-            drawChart();
+            // Re-draw the chart when the database is updated
+            nameRef.on('value', (snapshot) => {
+                data = snapshot.val();
+                drawChart();
+            });
         }
 
         function drawChart() {
