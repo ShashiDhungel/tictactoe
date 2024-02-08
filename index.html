@@ -1,83 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tic Tac Toe - Multiplayer</title>
-  <style>
-    table {
-      border-collapse: collapse;
-      margin: 20px;
-    }
-    td {
-      width: 50px;
-      height: 50px;
-      text-align: center;
-      border: 1px solid #000;
-      font-size: 24px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pie Chart App</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<h1>Tic Tac Toe - Multiplayer</h1>
+    <h1>Pie Chart App</h1>
 
-<table id="ticTacToe">
-  <tr>
-    <td id="cell-0" onclick="makeMove(0)"></td>
-    <td id="cell-1" onclick="makeMove(1)"></td>
-    <td id="cell-2" onclick="makeMove(2)"></td>
-  </tr>
-  <tr>
-    <td id="cell-3" onclick="makeMove(3)"></td>
-    <td id="cell-4" onclick="makeMove(4)"></td>
-    <td id="cell-5" onclick="makeMove(5)"></td>
-  </tr>
-  <tr>
-    <td id="cell-6" onclick="makeMove(6)"></td>
-    <td id="cell-7" onclick="makeMove(7)"></td>
-    <td id="cell-8" onclick="makeMove(8)"></td>
-  </tr>
-</table>
+    <label for="nameDropdown">Select a Name:</label>
+    <select id="nameDropdown">
+        <option value="John">John</option>
+        <option value="Jane">Jane</option>
+        <option value="Doe">Doe</option>
+        <!-- Add more options as needed -->
+    </select>
 
-<script>
-  const socket = new WebSocket('wss://ws.postman-echo.com/raw); // Replace with your WebSocket server URL
+    <button onclick="updateChart()">Submit</button>
 
-  let currentPlayer = 'X';
-  let board = ['', '', '', '', '', '', '', '', ''];
+    <canvas id="myChart" width="400" height="400"></canvas>
 
-  // Update the game board based on the received data
-  socket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    if (data.action === 'update') {
-      updateBoard(data.board);
-      currentPlayer = data.currentPlayer;
-    }
-  };
+    <script>
+        let data = {};
+        const ctx = document.getElementById('myChart').getContext('2d');
 
-  function makeMove(cell) {
-    if (board[cell] === '' && currentPlayer === 'X') {
-      board[cell] = 'X';
-      socket.send(JSON.stringify({ action: 'update', board: board, currentPlayer: 'O' }));
-      checkGameResult();
-    }
-  }
+        function updateChart() {
+            const dropdown = document.getElementById('nameDropdown');
+            const selectedName = dropdown.value;
 
-  function updateBoard(newBoard) {
-    board = newBoard;
-    for (let i = 0; i < 9; i++) {
-      document.getElementById('cell-' + i).innerHTML = board[i];
-    }
-  }
+            if (data[selectedName]) {
+                data[selectedName]++;
+            } else {
+                data[selectedName] = 1;
+            }
 
-  function checkGameResult() {
-    // Implement your game result checking logic here
-    // This might include checking for a winner or a tie
-    // Once the game result is determined, you can send a message to both players
-    // Example: socket.send(JSON.stringify({ action: 'gameOver', winner: 'X' }));
-  }
-</script>
+            drawChart();
+        }
+
+        function drawChart() {
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+
+            const backgroundColors = generateRandomColors(values.length);
+
+            const config = {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: backgroundColors,
+                    }],
+                },
+            };
+
+            new Chart(ctx, config);
+        }
+
+        function generateRandomColors(count) {
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                colors.push(getRandomColor());
+            }
+            return colors;
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
 
 </body>
 </html>
