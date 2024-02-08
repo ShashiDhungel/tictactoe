@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pie Chart App</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 10px;
+        }
+
+        canvas {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
@@ -56,7 +68,12 @@
                 },
             };
 
-            new Chart(ctx, config);
+            // Destroy previous chart instance to avoid stacking charts
+            if (window.myChart) {
+                window.myChart.destroy();
+            }
+
+            window.myChart = new Chart(ctx, config);
         }
 
         function generateRandomColors(count) {
