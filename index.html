@@ -37,6 +37,7 @@
     <script>
         let data = {};
         const ctx = document.getElementById('myChart').getContext('2d');
+        let myChart; // Declare myChart variable outside of the function
 
         function updateChart() {
             const dropdown = document.getElementById('nameDropdown');
@@ -68,12 +69,12 @@
                 },
             };
 
-            // Destroy previous chart instance to avoid stacking charts
-            if (window.myChart) {
-                window.myChart.destroy();
+            // Destroy previous chart instance if exists
+            if (myChart) {
+                myChart.destroy();
             }
 
-            window.myChart = new Chart(ctx, config);
+            myChart = new Chart(ctx, config);
         }
 
         function generateRandomColors(count) {
