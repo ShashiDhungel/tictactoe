@@ -69,26 +69,50 @@
             });
         }
 
-        function drawChart() {
-            const labels = Object.keys(data);
-            const values = Object.values(data);
+        function updateChart() {
+    const dropdown = document.getElementById('nameDropdown');
+    const selectedName = dropdown.value;
 
-            const backgroundColors = generateRandomColors(values.length);
+    // Increment the count in the database
+    const nameRef = database.ref('votes/' + selectedName); // Use a consistent path
+    nameRef.transaction((currentValue) => (currentValue || 0) + 1);
+}
 
-            const config = {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: backgroundColors,
-                    }],
-                },
-            };
+function drawChart() {
+    // Read the entire 'votes' node from the database
+    const votesRef = database.ref('votes');
 
-            // Destroy previous chart instance if exists
-            if (myChart) {
-                myChart.destroy();
+    votesRef.on('value', (snapshot) => {
+        data = snapshot.val();
+        drawChartWithData();
+    });
+}
+
+function drawChartWithData() {
+    const labels = Object.keys(data);
+    const values = Object.values(data);
+
+    const backgroundColors = generateRandomColors(values.length);
+
+    const config = {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: backgroundColors,
+            }],
+        },
+    };
+
+    // Destroy previous chart instance if exists
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, config);
+}
+
             }
 
             myChart = new Chart(ctx, config);
