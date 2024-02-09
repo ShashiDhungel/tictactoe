@@ -78,32 +78,40 @@
         }
 
         function drawChart() {
-            // Read the entire 'votes' node from the database
-            const votesRef = database.ref('votes');
+    // Read the entire 'votes' node from the database only once
+    const votesRef = database.ref('votes');
 
-            votesRef.on('value', (snapshot) => {
-                data = snapshot.val();
-                drawChartWithData();
-            });
-        }
+    votesRef.once('value', (snapshot) => {
+        data = snapshot.val();
+        drawChartWithData();
+    });
+}
 
-        function drawChartWithData() {
-            const labels = Object.keys(data);
-            const values = Object.values(data);
+function drawChartWithData() {
+    const labels = Object.keys(data);
+    const values = Object.values(data);
 
-            const backgroundColors = generateRandomColors(values.length);
+    const backgroundColors = generateRandomColors(values.length);
 
-            const config = {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: backgroundColors,
-                    }],
-                },
-            };
+    const config = {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: backgroundColors,
+            }],
+        },
+    };
 
+    // Destroy previous chart instance if exists
+    if (myChart) {
+        myChart.destroy();
+    }
+
+    myChart = new Chart(ctx, config);
+}
+        
             // Destroy previous chart instance if exists
             if (myChart) {
                 myChart.destroy();
