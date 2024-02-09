@@ -27,9 +27,9 @@
 
     <label for="nameDropdown">Select a Name:</label>
     <select id="nameDropdown">
-        <option value="John">John</option>
-        <option value="Jane">Jane</option>
-        <option value="Doe">Doe</option>
+        <option value="Niraj Thakur">Niraj</option>
+        <option value="Suman Shrestha">Suman</option>
+        <option value="Raghav Ghimire">Raghav</option>
         <!-- Add more options as needed -->
     </select>
 
@@ -59,60 +59,40 @@
             const selectedName = dropdown.value;
 
             // Increment the count in the database
-            const nameRef = database.ref('votes').child(selectedName);
+            const nameRef = database.ref('votes/' + selectedName);
             nameRef.transaction((currentValue) => (currentValue || 0) + 1);
+        }
 
-            // Re-draw the chart when the database is updated
-            nameRef.on('value', (snapshot) => {
+        function drawChart() {
+            // Read the entire 'votes' node from the database
+            const votesRef = database.ref('votes');
+
+            votesRef.on('value', (snapshot) => {
                 data = snapshot.val();
-                drawChart();
+                drawChartWithData();
             });
         }
 
-        function updateChart() {
-    const dropdown = document.getElementById('nameDropdown');
-    const selectedName = dropdown.value;
+        function drawChartWithData() {
+            const labels = Object.keys(data);
+            const values = Object.values(data);
 
-    // Increment the count in the database
-    const nameRef = database.ref('votes/' + selectedName); // Use a consistent path
-    nameRef.transaction((currentValue) => (currentValue || 0) + 1);
-}
+            const backgroundColors = generateRandomColors(values.length);
 
-function drawChart() {
-    // Read the entire 'votes' node from the database
-    const votesRef = database.ref('votes');
+            const config = {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: backgroundColors,
+                    }],
+                },
+            };
 
-    votesRef.on('value', (snapshot) => {
-        data = snapshot.val();
-        drawChartWithData();
-    });
-}
-
-function drawChartWithData() {
-    const labels = Object.keys(data);
-    const values = Object.values(data);
-
-    const backgroundColors = generateRandomColors(values.length);
-
-    const config = {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-                backgroundColor: backgroundColors,
-            }],
-        },
-    };
-
-    // Destroy previous chart instance if exists
-    if (myChart) {
-        myChart.destroy();
-    }
-
-    myChart = new Chart(ctx, config);
-}
-
+            // Destroy previous chart instance if exists
+            if (myChart) {
+                myChart.destroy();
             }
 
             myChart = new Chart(ctx, config);
@@ -134,6 +114,9 @@ function drawChartWithData() {
             }
             return color;
         }
+
+        // Initial draw when the page loads
+        drawChart();
     </script>
 
 </body>
